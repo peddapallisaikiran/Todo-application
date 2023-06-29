@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='reall.css'>
+    <script src='main.js'></script>
+</head>
+<body>
+    <div class="todos-bg-container">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <h1 class="todos-heading">Todos Applications</h1>
+              <h1 class="create-task-heading">
+                Create <span class="create-task-heading-subpart">Task</span>
+              </h1>
+              <input type="text" id="todoUserInput" class="todo-user-input" 
+              placeholder="Whats need to be done?"/>
+              <button class="add-todo-button" id="addtodoButton">Add</button>
+              <h1 class="todo-items-heading">
+                My <span class="todo-items-heading-subpart">Tasks</span>
+              </h1>
+                <ul class="todo-items-container" id="todoItemsContainer">
+                    <!-- <li class="todo-items-container d-flex flex-row">
+                        <input type="checkbox" class="checkbox-input" id="checkboxInput">
+                        <div class="d-flex flex-row label-container" >
+                            <label for="checkboxInput" class="checkbox-label">
+                                Learn Html
+                            </label>
+                            <div class="delete-icon-container">
+                                <i class="fa-solid fa-trash delete-icon"></i>
+                            </div>
+
+                        </div>
+                    </li>
+                    <li class="todo-items-container d-flex flex-row">
+                        <input type="checkbox" class="checkbox-input" id="checkboxInput">
+                        <div class="d-flex flex-row label-container" >
+                            <label for="checkboxInput" class="checkbox-label">
+                                Learn CSS3
+                            </label>
+                            <div class="delete-icon-container">
+                                <i class="fa-solid fa-trash delete-icon"></i>
+                            </div>
+    
+                        </div>
+                    </li> -->
+                </ul>
+                <button class="add-todo-button" id="saveTodoButton">Save</button> <!--Button created for storing the date-->
+            </div>
+          </div>
+        </div>
+    </div>
+</body>
+<script>
+let todoItemsContainer = document.getElementById('todoItemsContainer');
+let addtodoButton = document.getElementById('addtodoButton');  // Add button ki varable with Id
+let saveTodoButton = document.getElementById('saveTodoButton');   // button ki id ne generate cheyadam
+// let todoList = [   // Hidden bcoz we already stored in the localstorage
+//     {
+//         text : "Learn HTML5",
+//         uniqueId : 1
+//     },
+//     {
+//         text : "Learn CSS3",
+//         uniqueId :2
+//     },
+//     {
+//         text : "Learn JavaScript ES6",
+//         uniqueId : 3
+//     },
+//     {
+//         text : "Learn Python",
+//         uniqueId : 4
+//     }
+// ];
+
+
+function getTodostring(){    // function without any argument passing  
+    let TodoList = localStorage.getItem("todoList");   // Get the stored values
+    let parseList = JSON.parse(TodoList);    // convert in str to object
+    if (parseList === null){   // if the object is in null 
+        return [];             // return the empty array
+    }
+    else{
+        return parseList;   // Else print or display the object.
+    }
+}
+let todoList = getTodostring();   // Just created the function 
+
+saveTodoButton.onclick = function(){     // Event add chesam onclick on button which respond
+    localStorage.setItem("todoList",JSON.stringify(todoList));  // And storing the data in localstorage via JSON.string method
+}
+
+
+addtodoButton.onclick = function(){  // fun calling without passing a arguments
+    onTodo()
+}
+function ontodoStatus(checkboxId, labelId, todoId){     // ontodostatus creating line strick or not
+    let statusElement = document.getElementById(checkboxId);
+    console.log(statusElement.checked)
+    let labelelementId = document.getElementById(labelId);
+    // Good idea is Toogle 
+    labelelementId.classList.toggle("checked");
+    // if (statusElement.checked === true){
+    //     labelelementId.classList.add("checked");   // waste of lines 
+    // }
+    // else{
+    //     labelelementId.classList.remove("checked");
+    // }
+    let onstatusTodo = todoList.findIndex(function(ontodo){     // section 11
+        let ontodoId = "todo" + ontodo.uniqueId;
+        if(ontodoId === todoId){
+            return true;
+        }
+        else{
+            return false;
+        }
+    })
+    let todoObject = todoList[onstatusTodo];
+    if(todoObject.isChecked === true){
+        todoObject.isChecked = false;
+    }
+    else{
+        todoObject.isChecked = true;
+    }
+}
+function onclickdlt(todoId){
+    let dltElement = document.getElementById(todoId);
+    todoItemsContainer.removeChild(dltElement)
+    // Lets remobe todo Object in todoList and as well as in localstorage.
+    let dltIndex = todoList.findIndex(function(eachTodoid){
+        let TodoIndex = "todo" + eachTodoid.uniqueId;
+        if ( TodoIndex === todoId){
+            return true;
+        }
+        else{
+            return false;
+        }
+    });
+    todoList.splice(dltIndex,1);
+}
+
+
+
+function createTodoAndAppendTodo(todo){
+    // Adding a unique Id for non distrubance when we click on chechbox
+    let checkboxId = "checkbox" + todo.uniqueId;  // Id created 
+    let labelId = "label" + todo.uniqueId;    // Label Id should be created
+    let todoId = "todo" + todo.uniqueId;      // TodoId created
+
+    // creating a li of list by accesing the classList of CSS 
+    let todoItems = document.createElement("li");
+    todoItems.classList.add("todo-items-container","d-flex","flex-row");
+    todoItems.id = todoId;
+    todoItemsContainer.appendChild(todoItems); // appending the parent of body to child of created variable
+
+    
+
+    // creating a input element and its type and accessing the id and adding classList of CSS
+    let inputBox = document.createElement("input");
+    inputBox.type = "checkbox";
+    // inputBox.id = "checkboxInput";
+    inputBox.id = checkboxId;  // adding the id of
+    inputBox.classList.add("checkbox-input");
+    inputBox.checked = todo.isChecked;   // section 11 Checked ante class tho ischecked ane id ni call chsi reload chesina append iye untadhi UI lo 
+    inputBox.onclick = function(){
+        ontodoStatus(checkboxId, labelId,todoId);
+    }
+    todoItems.appendChild(inputBox);  // parent of container to inputt
+
+    // creating another container of label with div , class name = label-container 
+    let labelConatiner = document.createElement("div");
+    labelConatiner.classList.add("label-container","d-flex","flex-row");
+    todoItems.appendChild(labelConatiner);  // joining the parent of todoitem to child of labelcont
+
+    // creating a element of label by using DOM manipulator of (attribute , value), and class of CSS and 
+    let labelElement = document.createElement("label")
+    labelElement.setAttribute("for", checkboxId); // value as a chechbox variable id
+    labelElement.classList.add("checkbox-label");
+    labelElement.textContent = todo.text;   // adding the argument to the object created 
+    labelElement.id = labelId;   // id should be created for labelelement when tick the label should strickout(line-through)
+    if(todo.isChecked===true){   // Check chesi untadhi refresh chesina
+        labelElement.classList.add("checked");
+    }
+
+    labelConatiner.appendChild(labelElement);  // parant to child
+
+    // creating a new cont of div 
+    let deleteContainer = document.createElement("div");
+    deleteContainer.classList.add("delete-icon-container");
+    labelConatiner.appendChild(deleteContainer);  // parent to child
+
+    // adding the fontawasome icon to the <i> element 
+    let deleteIcon = document.createElement("i");
+    deleteIcon.classList.add("fa-solid","fa-trash","delete-icon");
+    deleteIcon.onclick = function(){
+        onclickdlt(todoId)
+    }
+    deleteContainer.appendChild(deleteIcon);   //parant to child 
+}
+function onTodo(){     // adding the Todo elements in below lines
+    let todoCount = todoList.length
+    todoCount = todoCount + 1;
+    let userInput = document.getElementById("todoUserInput");   // Id created 
+    let userValue = userInput.value;    // value should be enterded
+    if(userValue === ""){
+        alert("Enter valid input");   // in input without any discription when we click on add the alert shoulb be pass.
+        return;
+    }
+    let newTodo = {
+        text : userValue,
+        uniqueId : todoCount,
+        isChecked : false
+    }
+    todoList.push(newTodo);   // add chsninapudu data lo store avutadhi last lo push() method thooo
+    createTodoAndAppendTodo(newTodo);    // fun calling 
+    userInput.value = "";   // after added the input box is empty
+    
+    
+}
+for (let todo of todoList){
+    createTodoAndAppendTodo(todo);   // for of loop used to itearate the values of given object
+}
+// createTodoAndAppendTodo(todo[0]);
+// createTodoAndAppendTodo(todo[1]);
+// createTodoAndAppendTodo(todo[2]);
+// createTodoAndAppendTodo(todo[3]);
+    
+    
+</script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/aebd722566.js" crossorigin="anonymous"></script>
+</html>
